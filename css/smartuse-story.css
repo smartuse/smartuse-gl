@@ -1,0 +1,277 @@
+body { margin:0; padding:0;}
+#map {
+    position:absolute;
+    top:0; bottom:0;
+    right:0;
+    left:0;
+    background:rgba(52,51,50,1);
+    overflow:hidden;
+}
+#sidebar, #colorscale {
+  width:300px;
+  z-index: 100;
+  background-color: #333;
+}
+
+#sidebar{
+  border-right:1px solid #000;
+  height:100%;
+}
+.section {
+  border-bottom:1px solid #1c1c1c;
+}
+
+.label {
+  line-height:25px;
+}
+#tooltip {
+  position:absolute;
+  z-index:100;
+  pointer-events:none;
+  display:none;
+  opacity:0;
+}
+
+.inspector:hover #tooltip {
+  opacity:1;
+  display:block;
+}
+.inspector .mapboxgl-canvas-container.mapboxgl-interactive {
+  cursor:none;
+}
+.dot {
+  width:5px;
+  height:5px;
+  background:white;
+  border-radius:2.5px;
+  position:absolute;
+}
+.line {
+  position:absolute;
+  height:0px;
+  width:30px;
+  transform:rotate(45deg);
+  border-top:3px solid #333;
+  transform-origin:left center;
+  z-index:-1;
+  margin-top:-1.5px;
+}
+.bubble{
+  background:#333;
+  color:white;
+  padding:6px;
+  margin:15px;
+}
+
+/* form elements & geocoder overrides*/
+
+.mapboxgl-ctrl-geocoder {
+  min-width:0px;
+}
+.mapboxgl-ctrl-geocoder, .mapboxgl-ctrl-geocoder ul{
+  width:100%;
+  -webkit-filter:invert(100%);
+  color:white;
+}
+.mapboxgl-ctrl-geocoder ul > li.active > a,
+.mapboxgl-ctrl-geocoder ul > li > a:hover {
+  color:#55e9ff;
+  font-weight:bold;
+  background:black;
+}
+.mapboxgl-ctrl-geocoder input[type='text'],
+.mapboxgl-ctrl-geocoder input[type='text']:focus {
+  color:black;
+}
+
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #333;
+}
+.mapboxgl-ctrl-geocoder ul,
+li.active {
+  background: black;
+  color: white;
+}
+.fill-dark .rounded-toggle {
+  background:#1c1c1c;
+  color:#222;
+  padding:0px;
+  margin:0px;
+}
+.dark .rounded-toggle > *{
+  color:#999;
+}
+
+#placeselector {
+  background-color: rgba(0,0,0,0.5);
+}
+
+.fill-dark .rounded-toggle input[type=radio]:checked + label{
+  background:#ccc;
+  color:black;
+  font-weight:bold;
+}
+
+.mapboxgl-ctrl-geocoder ul > li > a {
+  color:#ccc;
+}
+/* legend stuff */
+
+#scale{
+  width:120px;
+  margin:10px;
+  height:120px;
+  z-index:-99;
+}
+#scale canvas{
+  overflow:hidden;
+  pointer-events:none;
+}
+.tilted #colorscale {
+  display:none;
+}
+.tilted #scale {
+  z-index:99;
+  background:rgba(0,0,0,0.75);
+  border-radius:50%;
+}
+
+#scale .mapboxgl-ctrl,
+#minimap .mapboxgl-ctrl{
+  display:none;
+}
+.icon:not(.big):after,
+.rcon:not(.big):after{
+  margin:0px;
+  font-size:18px;
+}
+
+
+#minimap{
+  height:220px;
+  cursor:crosshair;
+}
+
+.marker {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  border:2px solid #333;
+  background:#55e9ff;
+  cursor:pointer;
+  margin-left:-6px;
+  margin-top:-6px;
+  transition:all 0.2s;
+}
+
+.marker:hover{
+  background:orange;
+  width:16px;
+  height:16px;
+  margin-left:-10px;
+  margin-top:-10px;
+  border:2px solid white;
+}
+.mapboxgl-popup .mapboxgl-popup-tip{
+  opacity:0;
+}
+.mapboxgl-popup-content {
+  background:black;
+  padding:5px;
+}
+
+a.active {
+  color: #fff;
+}
+
+.mobile{
+  display:none;
+}
+@media (max-width: 800px) {
+  .desktop {
+    display: none;
+  }
+
+  .mobile{
+    display:block;
+  }
+  #map {
+    left:0px;
+  }
+}
+
+/**
+* Set rules for how the map overlays
+* (info box and legend) will be displayed
+* on the page. */
+.map-overlay {
+position: absolute;
+bottom: 0;
+right: 0;
+background: rgba(0, 0, 0, 0.4);
+margin-right: 20px;
+font-family: Arial, sans-serif;
+overflow: auto;
+border-radius: 3px;
+color: #fff;
+font-size: 13px;
+}
+
+#features {
+top: 0;
+height: 100px;
+margin-top: 20px;
+width: 250px;
+}
+
+#legend {
+padding: 10px;
+box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+line-height: 18px;
+height: 370px;
+margin-bottom: 40px;
+width: 280px;
+}
+
+.legend-key {
+display: inline-block;
+border-radius: 20%;
+border-color: #fff;
+border-width: 0.5px;
+width: 10px;
+height: 10px;
+margin-right: 5px;
+margin-top: 10px;
+}
+
+.legend-key-circle {
+display: inline-block;
+border-radius: 100%;
+border: 0.5px solid #fff;
+width: 10px;
+height: 10px;
+margin-right: 5px;
+margin-top: 10px;
+}
+
+.legend-key-circle-legend {
+display: inline-block;
+vertical-align: top;
+}
+
+.legend-key-ramp {
+  height:20px;
+  width:100%;
+}
+
+.legend-key-ramp-velovorteil {
+  background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 100%);
+}
+
+.legend-key-ramp-routedeltas {
+  background: -webkit-linear-gradient(left, #333 0%, #097685 30%, #9e0071 100%);
+}
+
+.legend-key-ramp-einpendler {
+  background: -webkit-linear-gradient(left, hsla(186, 64%, 69%, 0.1) 0%, hsla(186, 64%, 69%, 0.6) 100%);
+}
