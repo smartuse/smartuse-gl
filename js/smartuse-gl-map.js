@@ -4,8 +4,6 @@
 
 class Map {
 
-  map;
-
   constructor(token, style, container, center, zoom, minZoom = 8, maxZoom = 16) {
     mapboxgl.accessToken = token;
     this.map = new mapboxgl.Map({
@@ -30,29 +28,27 @@ class Map {
 //  Labels: 2 > start and end label, 3 > start, mid and end label
 */
 
-var _zoomModifiers = {
-  10: 1.5,
-  12: 5,
-  13.5: 12,
-  14: 19
-};
+var _zoomModifiers = [
+  [10, 1.5],
+  [12, 3.5],
+  [13.5, 8.5],
+  [14, 12.5],
+  [14.5, 20],
+  [15, 25],
+  [15.5, 40],
+  [16, 45]
+];
 
 class MapDataRange {
-  rangeStart = 0;
-  rangeEnd = 0;
-  labels = [];
-  interpolationRange = [];
-  targetRange = [];
-  relativeSize = 0;
-  zoomModifiers = {};
-  dataField = "";
 
-  constructor(data, labels, dataField = "", interpolationRange = "",targetRange = [10,50], inputModifier = 0.01, zoomModifiers = {}){
+  constructor(data, labels, dataField = "", interpolationRange = "",targetRange = [10,50], inputModifier = 0.01, inversed = false, zoomModifiers = []){
     this.rangeStart = 0;
     this.rangeEnd = 0;
 
     this.labels = labels;
     this.dataField = dataField;
+
+    this.inversed = inversed;
 
     if(data != ""){
       this.fromData(data)
@@ -70,10 +66,15 @@ class MapDataRange {
   }
 
   fromData(data){
-    this.rangeStart = Math.min(...data);
-    this.rangeEnd = Math.max(...data);
+    if(this.inversed){
+      this.rangeStart = Math.max(...data);
+      this.rangeEnd = Math.min(...data);
+    }
+    else {
+      this.rangeStart = Math.min(...data);
+      this.rangeEnd = Math.max(...data);
+    }
   }
-
 
   interpolateJSON() {
     var json = [];
@@ -81,16 +82,20 @@ class MapDataRange {
     json.push(["linear"]);
     if(this.zoomModifiers.length != 0){
       json.push(["zoom"]);
-      for (var [zoomLevel,zoomModifier] of Object.entries(this.zoomModifiers)){
+      for (var zoom of Object.entries(this.zoomModifiers)){
+        var zoomLevel = zoom[1][0];
+        var zoomModifier = zoom[1][1];
         json.push(Number(zoomLevel));
         json.push(["*",["*",zoomModifier,this.getJSON()],this.inputModifier]);
       }
     }
     else {
       json.push(this.getJSON());
+      json.push(this.targetRange[0]);
+      json.push(this.targetRange[1]);
+      json.push(this.interpolationRange[0]);
+      json.push(this.interpolationRange[1]);
     }
-    json.push(this.targetRange[0],this.interpolationRange[0]);
-    json.push(this.targetRange[1],this.interpolationRange[1]);
     return json;
   }
 
@@ -106,8 +111,6 @@ class MapDataRange {
 */
 
 class MapColorTable {
-  colorTable;
-  dataField;
 
   constructor(dataField,colorTable){
     this.colorTable = colorTable;
@@ -135,10 +138,6 @@ class MapColorTable {
 */
 
 class MapResource {
-  id;
-  type;
-  uri;
-  sourceLayer;
 
   constructor(id, type, uri, sourceLayer){
     this.id = id;
@@ -172,15 +171,6 @@ class MapResource {
 */
 
 class MapPaint {
-  mainColor = "#000";
-  secondaryColor = "transparent";
-  size = 10;
-  rimBodyRatio = 0.25;
-  opacity = 1;
-  haloColor = "#000";
-  haloWidth = 4;
-  dashArray = [];
-  type = "circle";
 
   constructor(mainColor, type = "circle", size = 1, opacity = 1, secondaryColor = "transparent", rimBodyRatio = 0.25, haloColor = "#000", haloWidth = 4, dashArray = []){
     this.type = type;
@@ -192,6 +182,7 @@ class MapPaint {
     this.haloColor = haloColor;
     this.haloWidth = haloWidth;
     this.dashArray = dashArray;
+    this.strokeWidth = rimBodyRatio;
   }
 
   // mapbox-gl paint json
@@ -205,7 +196,7 @@ class MapPaint {
         paint[prefix + "-opacity"] = this.opacity;
         if(this.rimBodyRatio > 0){
           paint[prefix + "-stroke-color"] = this.secondaryColor;
-          paint[prefix + "-stroke-width"] = this.size * this.rimBodyRatio;
+          paint[prefix + "-stroke-width"] = this.strokeWidth;
         }
         return paint;
         break;
@@ -238,12 +229,6 @@ class MapPaint {
 */
 
 class MapLayout {
-  textField;
-  textSize;
-  textJustify;
-  textAnchor;
-  textOffset;
-  textFont;
 
   constructor(textField, textSize, textJustify="left", textAnchor="left", textOffset=[1,0], textFont = ["Roboto Regular", "Arial Unicode MS Regular"]){
     this.textField = textField;
@@ -272,9 +257,6 @@ class MapLayout {
 */
 
 class MapDataFilter {
-  attribute;
-  value;
-  operator;
 
   constructor(attribute, value, operator="=="){
     this.attribute = attribute;
@@ -293,8 +275,6 @@ class MapDataFilter {
 */
 
 class MapCoords {
-  x;
-  y;
 
   constructor(x, y) {
     this.x = x;
@@ -313,18 +293,13 @@ class MapCoords {
 */
 
 class MapView {
-  id;
-  center;
-  zoom;
-  centerJSON;
 
   constructor(id, center, zoom = 12.5){
     this.id = id;
     this.center = center;
     if(center.match(/,/) != null){
       var coords = center.match(/(.+),(.+)/);
-      console.log(coords);
-      this.setupCenter(Number(coords[1]),Number(coords[2]);
+      this.setupCenter(Number(coords[1]),Number(coords[2]));
     }
     this.centerJSON = this.center.coordsJSON();
     this.zoom = zoom;
@@ -351,19 +326,17 @@ class MapView {
 
 class MapLegend {
 
-  type = "range-circle";
-  items = {};
-
-  constructor(type, items) {
+  constructor(type = "opacity-range", items) {
     this.type = type;
     this.items = items;
   }
 
   appendToLegend(legend){
+    console.log(this.type);
     legend.appendChild(document.createElement("p"))
 
-    if(this.type = "range-circle"){
-      for(var [label,value] of Object.entries(this.items)){
+    if(this.type == "opacity-range"){
+      for(var [label,value] of Object.entries(this.items.targetRange)){
         var item = document.createElement("div");
         var key = document.createElement("span");
         key.className = "legend-key";
@@ -371,17 +344,44 @@ class MapLegend {
         key.style.opacity = value;
 
         var value = document.createElement("span");
+        value.innerHTML = this.items.labels[label];
+        item.appendChild(key);
+        item.appendChild(value);
+        legend.appendChild(item);
+      }
+    } else if(this.type == "color-range"){
+      for(var [label,value] of Object.entries(this.items)){
+        var item = document.createElement("div");
+        var key = document.createElement("span");
+        key.className = "legend-key";
+        key.style.backgroundColor = value;
+        key.style.opacity = 1;
+
+        var value = document.createElement("span");
         value.innerHTML = label;
         item.appendChild(key);
         item.appendChild(value);
         legend.appendChild(item);
       }
-    } else if(this.type = "range-line"){
+    } else if(this.type == "circle-size-range"){
+      for(var [label,value] of Object.entries(this.items.targetRange)){
+        var item = document.createElement("div");
+        var key = document.createElement("span");
+        key.className = "legend-key";
+        key.style.backgroundColor = "transparent";
+        key.style.border = "#fff 1px solid";
+        key.style.borderRadius = "100%";
+        key.style.opacity = 1;
+        key.style.margin = "5px";
+        key.style.width = value+"px";
+        key.style.height = value+"px";
 
-    } else if(this.type = "range-opacity"){
-
-    } else if(this.type = "categories-colors"){
-
+        var value = document.createElement("span");
+        value.innerHTML = this.items.labels[label];
+        item.appendChild(key);
+        item.appendChild(value);
+        legend.appendChild(item);
+      }
     }
 
   }

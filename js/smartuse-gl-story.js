@@ -9,11 +9,6 @@
 */
 
 class StoryLayerCnf {
-  layerCnfId = "";
-  sourceLayer; // MapResource
-  paint; // MapPaint
-  filter = "";
-  legends = [];
 
   constructor(layerCnfId, sourceLayer, paint, filter, legends = []){
     this.layerCnfId = layerCnfId;
@@ -41,15 +36,6 @@ class StoryLayerCnf {
 */
 
 class StoryLayerState {
-  id = "";
-
-  layer = []; // Array of StoryLayerCnf()
-
-  title = "";
-  description = "";
-  text = "";
-
-  view; // MapView
 
   constructor(id, layer, view, title = "", description = "", text = ""){
     this.id = id;
@@ -81,8 +67,6 @@ class StoryLayerState {
 */
 
 class StoryBoard {
-
-  storyline = []; // Array of StoryLayerState()
 
   constructor(layerStates = []){
     this.storyline = layerStates;
@@ -125,24 +109,16 @@ function changeLayerState(map,newState){
 
 
   var newLayerState = story.storyline[newState];
-  console.log(newLayerState,newState);
   var storylineID = newLayerState.id;
 
   var storylayer = story.layerToLoad();
 
-  console.log("Changing states...",newLayerState);
-
   // Reset Layers
   for (var i in storylayer){
     var layer = storylayer[i][0];
+    document.getElementById(i).className = "";
     map.setLayoutProperty(layer.sourceLayer.id,'visibility','none');
   }
-
-  // var l = 0;
-  // for (story_point of story_layer_states){
-  //   document.getElementById(l).className = ""
-  //   l++
-  // }
 
   document.getElementById(newState).className = "active"
 
@@ -150,6 +126,17 @@ function changeLayerState(map,newState){
   var enabledLayer = newLayerState.layer
   for (var enabled of enabledLayer){
     map.setLayoutProperty(enabled.sourceLayer.id,'visibility','visible');
+  }
+
+  console.log(newLayerState);
+
+  // Legends
+
+  document.getElementById("legend").innerHTML = "";
+
+  var legends = newLayerState.layer[0].legends;
+  for (var legend in legends){
+    legends[legend].appendToLegend(document.getElementById("legend"));
   }
 
   //Set zoom and centerpoint
@@ -165,7 +152,7 @@ function changeLayerState(map,newState){
   //   var filter = ["==","storyline-id",storylineID]
   //   map.setFilter(layer["id"],filter)
   // }
-  // 
+  //
   // // ---- Filter Map Layers
   // if(Object.keys(newLayerState["filters"]).length > 0){
   //   for (var [layer,filter] of Object.entries(newLayerState["filters"])){
