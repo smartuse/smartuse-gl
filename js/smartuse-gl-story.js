@@ -105,8 +105,42 @@ class StoryBoard {
 // Interface functions
 //
 
-function changeLayerState(map,newState){
+function loadStory(map,story){
+  var storylayer = story.layerToLoad();
 
+  for (var i in storylayer){
+    var layer = storylayer[i][0];
+
+    if(!map.getSource(layer.sourceLayer.id)){
+      map.addSource(layer.sourceLayer.id,layer.sourceLayer.resourceJSON())
+
+      var style = {};
+      style["id"] = layer.sourceLayer.id;
+      style["type"] = layer.paint.type;
+      style["source"] = layer.sourceLayer.id;
+      style["source-layer"] = layer.sourceLayer.sourceLayer;
+      style["paint"] = layer.paint.paintJSON();
+
+      map.addLayer(style);
+
+    }
+  }
+
+  // for (var [name,layer] of Object.entries(story_annotation_layers)){
+  //   var source = layer["id"]
+  //   var style = story_annotation_styles[layer["paint"]]
+  //   console.log(layer, style)
+  //   if(!mapWrapper.map.getSource(layer["id"])){
+  //     console.log("adding as source...")
+  //     mapWrapper.map.addSource(layer["id"],layer["mapboxSourceParams"])
+  //   }
+  //   mapWrapper.map.addLayer(style)
+  // }
+
+  changeLayerState(mapWrapper.map,0)
+}
+
+function changeLayerState(map,newState){
 
   var newLayerState = story.storyline[newState];
   var storylineID = newLayerState.id;
@@ -121,23 +155,29 @@ function changeLayerState(map,newState){
   }
 
   document.getElementById(newState).className = "active"
+  document.getElementById("legend").innerHTML = "";
 
-  // Only show enabled ones
+  // Only for enabled ones
   var enabledLayer = newLayerState.layer
   for (var enabled of enabledLayer){
+    // Repaint layers
+    for (var [name,val] of Object.entries(enabled.paint.paintJSON())){
+      map.setPaintProperty(enabled.sourceLayer.id,name,val)
+    }
+
+    if(enabled.filter != ""){
+      console.log("filtering... ",layer,enabled.filter)
+      map.setFilter(enabled.sourceLayer.id,enabled.filter)
+    }
+
+    var legends = enabled.legends;
+    for (var legend in enabled.legends){
+      enabled.legends[legend].appendToLegend(document.getElementById("legend"));
+    }
+
     map.setLayoutProperty(enabled.sourceLayer.id,'visibility','visible');
   }
 
-  console.log(newLayerState);
-
-  // Legends
-
-  document.getElementById("legend").innerHTML = "";
-
-  var legends = newLayerState.layer[0].legends;
-  for (var legend in legends){
-    legends[legend].appendToLegend(document.getElementById("legend"));
-  }
 
   //Set zoom and centerpoint
   map.flyTo({
@@ -153,33 +193,7 @@ function changeLayerState(map,newState){
   //   map.setFilter(layer["id"],filter)
   // }
   //
-  // // ---- Filter Map Layers
-  // if(Object.keys(newLayerState["filters"]).length > 0){
-  //   for (var [layer,filter] of Object.entries(newLayerState["filters"])){
-  //     console.log("filtering... ",layer,filter)
-  //     map.setFilter(layer,filter)
-  //   }
-  // }
-  //
-  // // Repaint layers
-  // if(Object.keys(newLayerState["paint-update"]).length>0){
-  //   for (var [layer,state] of Object.entries(newLayerState["paint-update"])){
-  //     var newStyle = smartuse_styles[state]
-  //     for (var [name,val] of Object.entries(newStyle["paint"])){
-  //       map.setPaintProperty(layer,name,val)
-  //     }
-  //   }
-  // }
-  //
-  // // Update legends
-  // document.getElementById("legend").innerHTML = "";
-  //
-  // if(Object.keys(newLayerState["legends"]).length > 0){
-  //   for (var [layer,legend] of Object.entries(newLayerState["legends"])){
-  //     console.log(layer,legend)
-  //     updateLegend(legend);
-  //   }
-  // }
+
 }
 
 function tilt(map,eh){
