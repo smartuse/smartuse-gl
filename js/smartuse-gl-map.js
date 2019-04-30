@@ -4,7 +4,7 @@
 
 class Map {
 
-  constructor(token, style, container, center, zoom, minZoom = 8, maxZoom = 16) {
+  constructor(token, style, container, center, zoom, mapAnnotations, minZoom = 8, maxZoom = 16) {
     mapboxgl.accessToken = token;
     this.map = new mapboxgl.Map({
         container: container, // container id
@@ -19,6 +19,8 @@ class Map {
         }
     });
     this.map.addControl(new mapboxgl.NavigationControl());
+
+    this.annotations = mapAnnotations;
   }
 
 }
@@ -188,7 +190,7 @@ class MapPaint {
   // mapbox-gl paint json
   paintJSON(){
     var prefix = this.type;
-    var paint = {}
+    var paint = {};
     switch (this.type) {
       case "circle":
         paint[prefix + "-radius"] = this.size;
@@ -207,18 +209,22 @@ class MapPaint {
         if(this.dashArray.length > 0){
           paint[prefix + "-dasharray"] = this.dashArray;
         }
+        return paint;
         break;
       case "fill":
-        return {}
+        return paint;
         break;
       case "fill-extrusion":
-        return {}
+        return paint;
         break;
       case "symbol":
-        return {}
+        paint["text-color"] = this.mainColor;
+        paint["text-halo-color"] = this.haloColor;
+        paint["text-halo-width"] = this.haloWidth;
+        return paint;
         break;
       default:
-        return {}
+        return paint;
     }
   }
 
@@ -244,7 +250,7 @@ class MapLayout {
       "text-field": ["to-string", ["get", this.textField]],
       "text-font": this.textFont,
       "text-size": this.textSize,
-      "text-justify": this.textSize,
+      "text-justify": this.textJustify,
       "text-anchor": this.textAnchor,
       "text-offset": this.textOffset
     };
@@ -332,7 +338,6 @@ class MapLegend {
   }
 
   appendToLegend(legend){
-    console.log(this.type);
     legend.appendChild(document.createElement("p"))
 
     if(this.type == "opacity-range"){

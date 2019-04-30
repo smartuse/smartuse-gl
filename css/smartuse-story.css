@@ -64,7 +64,6 @@ body { margin:0; padding:0;}
 }
 
 /* form elements & geocoder overrides*/
-
 .mapboxgl-ctrl-geocoder {
   min-width:0px;
 }

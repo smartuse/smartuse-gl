@@ -8,27 +8,67 @@
 //  Story layer config
 */
 
-class StoryLayerCnf {
-
-  constructor(layerCnfId, sourceLayer, paint, filter, legends = []){
+class LayerCnf {
+  constructor(layerCnfId,sourceLayer,paint,layout){
+    this.sourceLayer = sourceLayer;
     this.layerCnfId = layerCnfId;
     this.paint = paint;
+    this.layout = layout;
+  }
+}
+
+class StoryLayerCnf extends LayerCnf {
+
+  constructor(layerCnfId, sourceLayer, paint, filter, legends = [], layout = ""){
+    super(layerCnfId,sourceLayer,paint,layout);
     this.filter = filter;
     this.legends = legends;
-    this.sourceLayer = sourceLayer;
   }
 
   layerJSON() {
     var json = {};
-    json["id"] = this.layerCnfId;
+    json["id"] = this.sourceLayer.id;
+    json["type"] = this.paint.type;
     json["paint"] = this.paint.paintJSON();
-    json["filter"] = this.filter;
+    if(this.filter != ""){
+      json["filter"] = this.filter;
+    }
     json["legends"] = this.legends;
-    json["source"] = this.sourceLayer.source;
+    json["source"] = this.sourceLayer.id;
     json["source-layer"] = this.sourceLayer.sourceLayer;
     return json;
   }
 
+}
+
+class AnnotationLayerCnf extends LayerCnf {
+  constructor(layerCnfId,sourceLayer,type){
+    var paint = su_annotation_styles[type];
+    var layout = "";
+    switch(type){
+      case "text":
+        layout = su_annotation_layouts[type];
+        break;
+      default:
+        layout = "";
+    }
+
+    super(layerCnfId,sourceLayer,paint,layout);
+    this.type = type;
+  }
+
+  layerJSON() {
+    var json = {};
+    json["id"] = this.sourceLayer.id;
+    json["type"] = this.paint.type;
+    json["paint"] = this.paint.paintJSON();
+    if(this.type == "text"){
+      json["layout"] = this.layout.layoutJSON();
+    }
+    json["source"] = this.sourceLayer.id;
+    json["source-layer"] = this.sourceLayer.sourceLayer;
+    return json;
+  }
 }
 
 /*
@@ -105,37 +145,26 @@ class StoryBoard {
 // Interface functions
 //
 
-function loadStory(map,story){
+function loadStory(mapWrapper,story){
   var storylayer = story.layerToLoad();
+  var map = mapWrapper.map;
 
   for (var i in storylayer){
     var layer = storylayer[i][0];
 
     if(!map.getSource(layer.sourceLayer.id)){
       map.addSource(layer.sourceLayer.id,layer.sourceLayer.resourceJSON())
-
-      var style = {};
-      style["id"] = layer.sourceLayer.id;
-      style["type"] = layer.paint.type;
-      style["source"] = layer.sourceLayer.id;
-      style["source-layer"] = layer.sourceLayer.sourceLayer;
-      style["paint"] = layer.paint.paintJSON();
-
-      map.addLayer(style);
-
+      map.addLayer(layer.layerJSON());
     }
   }
 
-  // for (var [name,layer] of Object.entries(story_annotation_layers)){
-  //   var source = layer["id"]
-  //   var style = story_annotation_styles[layer["paint"]]
-  //   console.log(layer, style)
-  //   if(!mapWrapper.map.getSource(layer["id"])){
-  //     console.log("adding as source...")
-  //     mapWrapper.map.addSource(layer["id"],layer["mapboxSourceParams"])
-  //   }
-  //   mapWrapper.map.addLayer(style)
-  // }
+  var annotationLayers = mapWrapper.annotations;
+  for (var layer of annotationLayers){
+    if(!map.getSource(layer.sourceLayer.id)){
+      map.addSource(layer.sourceLayer.id,layer.sourceLayer.resourceJSON())
+      map.addLayer(layer.layerJSON())
+    }
+  }
 
   changeLayerState(mapWrapper.map,0)
 }
@@ -166,7 +195,6 @@ function changeLayerState(map,newState){
     }
 
     if(enabled.filter != ""){
-      console.log("filtering... ",layer,enabled.filter)
       map.setFilter(enabled.sourceLayer.id,enabled.filter)
     }
 
@@ -175,9 +203,16 @@ function changeLayerState(map,newState){
       enabled.legends[legend].appendToLegend(document.getElementById("legend"));
     }
 
+    // Filter Annotation layer
+    if(mapWrapper.annotations.length > 0){
+      var annotationLayers = mapWrapper.annotations;
+      for (var layer of annotationLayers){
+        map.setFilter(layer.sourceLayer.id,["==","storyline-id",newLayerState.id])
+      }
+    }
+
     map.setLayoutProperty(enabled.sourceLayer.id,'visibility','visible');
   }
-
 
   //Set zoom and centerpoint
   map.flyTo({
