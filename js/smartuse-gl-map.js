@@ -206,7 +206,7 @@ class MapPaint {
         paint[prefix + "-width"] = this.size;
         paint[prefix + "-color"] = this.mainColor;
         paint[prefix + "-opacity"] = this.opacity;
-        if(this.dashArray.length > 0){
+        if(this.dashArray.length > 0 && this.dashArray != ""){
           paint[prefix + "-dasharray"] = this.dashArray;
         }
         return paint;
