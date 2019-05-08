@@ -77,13 +77,14 @@ class AnnotationLayerCnf extends LayerCnf {
 
 class StoryLayerState {
 
-  constructor(id, layer, view, title = "", description = "", text = ""){
+  constructor(id, layer, view, title = "", description = "", text = "", icon = new StoryIcon()){
     this.id = id;
     this.layer = layer;
     this.title = title;
     this.description = description;
     this.text = text;
     this.view = view;
+    this.icon = icon;
   }
 
   layerStateJSON(){
@@ -94,6 +95,7 @@ class StoryLayerState {
     json["id"] = this.id;
     json["layers"] = this.layer;
     json["view"] = this.view.viewJSON();
+    josn["icon"] = this.icon.iconJSON();
     return json;
   }
 
@@ -101,6 +103,39 @@ class StoryLayerState {
 
 }
 
+/*
+// icon
+*/
+
+class StoryIcon {
+
+  constructor(icon="",text=""){
+    this.icon = icon;
+    this.text = text;
+  }
+
+  iconJSON(){
+    var json = {};
+    json["icon"] = this.icon;
+    json["text"] = this.text;
+    return json;
+  }
+
+  assignIcon(icon){
+    var icons = {
+      "ors":"route",
+      "ors-routing":"route",
+      "ors-isochronen":"ruler",
+      "transit":"train",
+      "statent":"briefcase",
+      "statpop":"building",
+      "bikeable":"comments",
+      "smi":"mobile",
+    }
+    return (icon in icons) ? icons[icon] : "";
+  }
+
+}
 
 /*
 //  Storyline

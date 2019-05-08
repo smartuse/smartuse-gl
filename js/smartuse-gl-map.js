@@ -212,9 +212,16 @@ class MapPaint {
         return paint;
         break;
       case "fill":
+        paint[prefix + "-color"] = this.mainColor;
+        paint[prefix + "-opacity"] = this.opacity;
+        paint[prefix + "-outline-color"] = this.secondaryColor;
         return paint;
         break;
       case "fill-extrusion":
+        paint[prefix + "-color"] = this.mainColor;
+        paint[prefix + "-opacity"] = this.opacity;
+        paint[prefix + "-base"] = 0;
+        paint[prefix + "-height"] = this.size;
         return paint;
         break;
       case "symbol":
