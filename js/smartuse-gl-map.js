@@ -226,8 +226,10 @@ class MapPaint {
         break;
       case "symbol":
         paint["text-color"] = this.mainColor;
-        paint["text-halo-color"] = this.haloColor;
-        paint["text-halo-width"] = this.haloWidth;
+        if(this.haloColor != ""){
+          paint["text-halo-color"] = this.haloColor;
+          paint["text-halo-width"] = this.haloWidth;
+        }
         return paint;
         break;
       default:
@@ -243,13 +245,14 @@ class MapPaint {
 
 class MapLayout {
 
-  constructor(textField, textSize, textJustify="left", textAnchor="left", textOffset=[1,0], textFont = ["Roboto Regular", "Arial Unicode MS Regular"]){
+  constructor(textField, textSize, textJustify="left", textAnchor="left", textOffset=[1,0], textRotate=0, textFont = ["Roboto Regular", "Arial Unicode MS Regular"]){
     this.textField = textField;
     this.textSize = textSize;
     this.textJustify = textJustify;
     this.textAnchor = textAnchor;
     this.textOffset = textOffset;
     this.textFont = textFont;
+    this.textRotate = textRotate;
   }
 
   layoutJSON(){
@@ -259,7 +262,8 @@ class MapLayout {
       "text-size": this.textSize,
       "text-justify": this.textJustify,
       "text-anchor": this.textAnchor,
-      "text-offset": this.textOffset
+      "text-offset": this.textOffset,
+      "text-rotate": this.textRotate
     };
   }
 
