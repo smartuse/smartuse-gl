@@ -26,13 +26,16 @@ class StoryLayerCnf extends LayerCnf {
   }
 
   layerJSON() {
-    console.log(this)
     var json = {};
     json["id"] = this.sourceLayer.id;
     json["type"] = this.paint.type;
     json["paint"] = this.paint.paintJSON();
     if(this.filter != ""){
       json["filter"] = this.filter;
+    }
+    if(this.layout != ""){
+      console.log("With Layout: ",this.layout.layoutJSON());
+      json["layout"] = this.layout.layoutJSON();
     }
     json["legends"] = this.legends;
     json["source"] = this.sourceLayer.id;
@@ -189,8 +192,9 @@ function loadStory(mapWrapper,story){
   for (var i in storylayer){
     var sublayer = storylayer[i];
     for (layer of sublayer){
-      console.log(layer)
+
       if(!map.getSource(layer.sourceLayer.id)){
+        console.log("Adding: ",layer.layerJSON());
         map.addSource(layer.sourceLayer.id,layer.sourceLayer.resourceJSON())
         map.addLayer(layer.layerJSON());
       }
