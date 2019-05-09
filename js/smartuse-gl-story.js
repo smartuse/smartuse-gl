@@ -34,7 +34,6 @@ class StoryLayerCnf extends LayerCnf {
       json["filter"] = this.filter;
     }
     if(this.layout != ""){
-      console.log("With Layout: ",this.layout.layoutJSON());
       json["layout"] = this.layout.layoutJSON();
     }
     json["legends"] = this.legends;
@@ -66,7 +65,6 @@ class AnnotationLayerCnf extends LayerCnf {
     json["id"] = this.sourceLayer.id;
     json["type"] = this.paint.type;
     json["paint"] = this.paint.paintJSON();
-    console.log(this.paint);
     if(this.type == "text"){
       json["layout"] = this.layout.layoutJSON();
     }
@@ -194,7 +192,6 @@ function loadStory(mapWrapper,story){
     for (layer of sublayer){
 
       if(!map.getSource(layer.sourceLayer.id)){
-        console.log("Adding: ",layer.layerJSON());
         map.addSource(layer.sourceLayer.id,layer.sourceLayer.resourceJSON())
         map.addLayer(layer.layerJSON());
       }
@@ -231,14 +228,24 @@ function changeLayerState(map,newState){
   document.getElementById(newState).className = "active"
   document.getElementById("legend").innerHTML = "";
 
+  var subtitle = document.getElementById("story-subtitle");
+  subtitle.innerHTML = "";
+  var h1 = document.createElement("h1");
+  h1.innerText = newLayerState.description;
+  subtitle.appendChild(h1);
+
+  var storytext = document.getElementById("story-text");
+  storytext.innerHTML = "";
+  var p = document.createElement("p");
+  p.innerText = newLayerState.text;
+  storytext.appendChild(p);
+
   // Only for enabled ones
   var enabledLayer = newLayerState.layer
+  var l = 0;
   for (var enabled of enabledLayer){
     // Repaint layers
-    console.log(enabled);
-    console.log(enabled.paint.paintJSON());
     for (var [name,val] of Object.entries(enabled.paint.paintJSON())){
-      console.log(enabled.sourceLayer.id,name,val);
       if(val != ""){
         map.setPaintProperty(enabled.sourceLayer.id,name,val);
       }
@@ -251,16 +258,17 @@ function changeLayerState(map,newState){
     var legendContainer = document.getElementById("legend");
 
     var legends = enabled.legends;
-    l = 0;
+
     for (var legend in enabled.legends){
+      console.log(enabled.legends[legend]);
       enabled.legends[legend].appendToLegend(legendContainer);
       l += 1;
     }
 
-    legendContainer.className = (l > 0)?"map-overlay active pin-bottomright":"map-overlay";
-
     map.setLayoutProperty(enabled.sourceLayer.id,'visibility','visible');
   }
+
+  legendContainer.className = (l > 0)?"map-overlay active pin-bottomright":"map-overlay";
 
   // Filter Annotation layer
   if(mapWrapper.annotations.length > 0){
