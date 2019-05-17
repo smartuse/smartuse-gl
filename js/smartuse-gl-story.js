@@ -179,6 +179,30 @@ class StoryBoard {
 
 }
 
+class StoryboardPlayer {
+  constructor(frames){
+    this.playFrames = frames; // Array of Time on Screen in Seconds
+    this.current = 0;
+  }
+
+  frameSeconds(){
+    return this.playFrames[this.current] * 1000;
+  }
+
+  play(){
+    var _this = this;
+    _this.current = 1;
+    console.log("play",this);
+    setTimeout(function nextFrame(){
+      console.log("nextframe",_this.current);
+      changeLayerState(mapWrapper.map,_this.current);
+      if(_this.playFrames.length - 1 != _this.current){
+        _this.current += 1;
+        setTimeout(nextFrame,_this.frameSeconds());
+      }},_this.frameSeconds());
+  }
+}
+
 //
 // Interface functions
 //
@@ -190,8 +214,8 @@ function loadStory(mapWrapper,story){
   for (var i in storylayer){
     var sublayer = storylayer[i];
     for (layer of sublayer){
-
       if(!map.getSource(layer.sourceLayer.id)){
+        console.log("Adding:",layer.layerJSON());
         map.addSource(layer.sourceLayer.id,layer.sourceLayer.resourceJSON())
         map.addLayer(layer.layerJSON());
       }
