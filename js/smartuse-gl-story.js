@@ -192,9 +192,9 @@ class StoryboardPlayer {
   play(){
     var _this = this;
     _this.current = 1;
-    console.log("play",this);
+    //console.log("play",this);
     setTimeout(function nextFrame(){
-      console.log("nextframe",_this.current);
+      //console.log("nextframe",_this.current);
       changeLayerState(mapWrapper.map,_this.current);
       if(_this.playFrames.length - 1 != _this.current){
         _this.current += 1;
@@ -284,7 +284,7 @@ function changeLayerState(map,newState){
     var legends = enabled.legends;
 
     for (var legend in enabled.legends){
-      console.log(enabled.legends[legend]);
+      //console.log(enabled.legends[legend]);
       enabled.legends[legend].appendToLegend(legendContainer);
       l += 1;
     }
