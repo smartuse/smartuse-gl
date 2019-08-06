@@ -201,7 +201,7 @@ a.active {
 .map-overlay {
   display: none;
   position: absolute;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(10, 10, 10, 0.8);
   margin-right: 20px;
   font-family: "Roboto", "Arial", sans-serif;
   overflow: auto;
@@ -224,13 +224,41 @@ margin-top: 20px;
 width: 250px;
 }
 
-#legend {
+.legend {
 padding: 10px;
 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 line-height: 18px;
 min-height: 200px;
 margin-bottom: 40px;
 min-width: 200px;
+}
+
+@media only screen and (max-device-width: 500px) {
+  .legend {
+    min-height: 40px;
+    min-width: 90px;
+  }
+
+  .legend:hover .legend-wrapper {
+    display: inherit;
+    margin-bottom: 20px;
+  }
+
+  .legend:hover .toggle {
+    display: none;
+  }
+}
+
+@media only screen and (max-device-width: 500px) and (orientation: portrait) {
+  .legend {
+    margin-right: 10px;
+  }
+}
+
+@media only screen and (max-device-width: 500px) and (orientation: landscape) {
+  .legend {
+    margin-right: 50px;
+  }
 }
 
 .legend-key {
@@ -282,6 +310,25 @@ vertical-align: top;
   background: -webkit-linear-gradient(left, hsla(186, 64%, 69%, 0.1) 0%, hsla(186, 64%, 69%, 0.6) 100%);
 }
 
+.legend .toggle {
+  display: none;
+  text-align: right;
+  width: 60px;
+  padding: 10px;
+}
+
+@media only screen and (max-device-width: 500px) {
+  .legend .toggle {
+    display: block;
+    position: absolute;
+    bottom: 0;
+  }
+
+  .legend-wrapper {
+    display: none;
+  }
+}
+
 hr.legend-key-line{
   border: 0;
   margin: 0 10px -10px;
@@ -294,6 +341,69 @@ hr.legend-key-line{
 #sidebar {
   overflow-y: auto;
   max-height: 50%;
+}
+
+#sidebar a.story-browser {
+  width: 20%;
+  height: 50px;
+  display: block;
+  position: fixed;
+  top: 0;
+  opacity: 0.5;
+}
+
+#sidebar a.story-browser {
+  padding-top: 17px;
+  color: #fff;
+  font-family: "fontawesome";
+}
+
+#sidebar a.story-nav-left {
+  left: 0;
+  padding-right: 25px;
+}
+#sidebar a.story-nav-left:after {
+  content: "";
+}
+#sidebar a.story-nav-right {
+  right: 0;
+  padding-left: 25px;
+}
+#sidebar a.story-nav-right::after {
+  content: "";
+}
+
+@media only screen and (max-device-width: 500px) {
+  #sidebar{
+    height: 50px;
+    width: 100%;
+    text-align: center;
+    overflow-y: hidden;
+  }
+
+  #story-points {
+    height: 20px;
+  }
+
+  #sidebar ul li a {
+    display: none;
+  }
+
+  #sidebar ul li a.active {
+    padding-top: 5px; padding-bottom: 5px;
+    display: inherit;
+  }
+
+  #sidebar a {
+    /* font-weight: 900; */
+    font-size: 20px;
+    text-transform: none;
+  }
+
+
+  .mapboxgl-ctrl-top-right {
+    top: 60px;
+  }
 }
 
 #story-subtitle h1 {

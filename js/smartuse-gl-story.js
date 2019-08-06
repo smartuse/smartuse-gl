@@ -160,21 +160,55 @@ class StoryBoard {
 
   printStoryList(listContainer) {
     var i = 0
+
+    document.getElementById("story-browser-nav-left").addEventListener("click",this.navStory);
+    document.getElementById("story-browser-nav-right").addEventListener("click",this.navStory);
+
     for (var story_point in this.storyline){
       var li = document.createElement("li");
       var a = document.createElement("a");
+      var labelText = (i+1).toString() + ". " + story.storyline[story_point].title;
       a.id = i;
       a.onclick = this.changeStory;
-      a.innerText = (i+1).toString() + ". " + story.storyline[story_point].title;
+      a.innerText = labelText;
       li.appendChild(a);
-      listContainer.appendChild(li);
+      document.getElementById(listContainer).appendChild(li);
 
       i++;
     }
   }
 
+  navStory(element){
+    var max = 0;
+    var direction = (Array.prototype.slice.call(element.srcElement.classList).includes("story-nav-right"))?1:-1;
+    var currentId = 0;
+    var storybrowser = Array.prototype.slice.call(document.getElementById("story-points").childNodes);
+
+    storybrowser.forEach(function(item){
+      if(item.childNodes.length > 0){
+        if(item.firstChild.classList.length > 0){
+          if(Array.prototype.slice.call(item.firstChild.classList).includes("active")){
+            currentId = parseInt(item.firstChild.id);
+          }
+        }
+        max += 1;
+      }
+    });
+
+    // compensate for meta entry
+    max -= 1;
+
+    var nextId = (direction == -1)?currentId - 1:currentId + 1;
+
+    nextId = (nextId < 0)?max:nextId;
+    nextId = (nextId > max)?0:nextId;
+
+    changeLayerState(mapWrapper.map,nextId);
+  }
+
   changeStory(element){
-    changeLayerState(mapWrapper.map,element.srcElement.id);
+    var id = (element.srcElement.value !== undefined)?element.srcElement.value:element.srcElement.id;
+    changeLayerState(mapWrapper.map,id);
   }
 
 }
@@ -192,9 +226,7 @@ class StoryboardPlayer {
   play(){
     var _this = this;
     _this.current = 1;
-    //console.log("play",this);
     setTimeout(function nextFrame(){
-      //console.log("nextframe",_this.current);
       changeLayerState(mapWrapper.map,_this.current);
       if(_this.playFrames.length - 1 != _this.current){
         _this.current += 1;
@@ -215,7 +247,6 @@ function loadStory(mapWrapper,story){
     var sublayer = storylayer[i];
     for (layer of sublayer){
       if(!map.getSource(layer.sourceLayer.id)){
-        console.log("Adding:",layer.layerJSON());
         map.addSource(layer.sourceLayer.id,layer.sourceLayer.resourceJSON())
         map.addLayer(layer.layerJSON());
       }
@@ -280,11 +311,11 @@ function changeLayerState(map,newState){
     }
 
     var legendContainer = document.getElementById("legend");
+    var legendWrapper = document.getElementById("legendWrapper");
 
     var legends = enabled.legends;
 
     for (var legend in enabled.legends){
-      //console.log(enabled.legends[legend]);
       enabled.legends[legend].appendToLegend(legendContainer);
       l += 1;
     }
@@ -292,7 +323,8 @@ function changeLayerState(map,newState){
     map.setLayoutProperty(enabled.sourceLayer.id,'visibility','visible');
   }
 
-  legendContainer.className = (l > 0)?"map-overlay active pin-bottomright":"map-overlay";
+  legendWrapper.className = (l > 0)?"map-overlay active pin-bottomright legend":"map-overlay legend";
+  // legendContainer.className = (l > 0)?"map-overlay active pin-bottomright":"map-overlay";
 
   // Filter Annotation layer
   if(mapWrapper.annotations.length > 0){

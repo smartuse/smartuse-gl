@@ -344,7 +344,6 @@ class MapView {
 class MapLegend {
 
   constructor(legenType, items) {
-    //console.log(legenType);
     this.type = legenType;
     this.items = items;
   }
@@ -352,11 +351,8 @@ class MapLegend {
   appendToLegend(legend){
     legend.appendChild(document.createElement("p"))
 
-    //console.log(this.type);
-
     if(this.type == "opacity-range"){
       for(var [label,value] of Object.entries(this.items.targetRange)){
-        // console.log(label,value,this.items);
         var item = document.createElement("div");
         var key = document.createElement("span");
         key.className = "legend-key";
@@ -395,7 +391,6 @@ class MapLegend {
         stop += stopGap;
       }
       gradientString += ")";
-      //console.log(gradientString);
 
       var item = document.createElement("div");
       var key = document.createElement("span");
@@ -413,7 +408,6 @@ class MapLegend {
 
     } else if(this.type == "circle-size-range"){
       for(var [label,value] of Object.entries(this.items.targetRange)){
-        // console.log("circle-size",label,value,this.items);
         var circle_size = value * 0.5;
         var item = document.createElement("div");
         var key = document.createElement("span");
@@ -434,7 +428,6 @@ class MapLegend {
         legend.appendChild(item);
       }
     } else if(this.type == "dashed-line"){
-      //console.log(this);
       for(label of this.items.labels){
         var item = document.createElement("div");
         var key = document.createElement("hr");
@@ -449,7 +442,6 @@ class MapLegend {
         legend.appendChild(item);
       }
     } else if(this.type == "line"){
-      //console.log(this);
       for(label of this.items.labels){
         var item = document.createElement("div");
         var key = document.createElement("hr");
@@ -464,7 +456,6 @@ class MapLegend {
         legend.appendChild(item);
       }
     } else if(this.type == "line-range"){
-      //console.log(this);
 
       // "Legend Label": {"width":1,"line-type":"solid",color:"#fff"}
 
