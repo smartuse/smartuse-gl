@@ -349,7 +349,6 @@ class MapLegend {
   }
 
   appendToLegend(legend){
-    legend.appendChild(document.createElement("p"))
 
     if(this.type == "opacity-range"){
       for(var [label,value] of Object.entries(this.items.targetRange)){

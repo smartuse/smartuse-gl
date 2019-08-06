@@ -225,12 +225,15 @@ width: 250px;
 }
 
 .legend {
-padding: 10px;
-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-line-height: 18px;
-min-height: 200px;
-margin-bottom: 40px;
-min-width: 200px;
+  padding: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  line-height: 18px;
+  min-height: 20px;
+  margin-bottom: 40px;
+  margin-right: 60px;
+  min-width: 150px;
+  max-height: 75%;
+  overflow: scroll;
 }
 
 @media only screen and (max-device-width: 500px) {
@@ -339,21 +342,22 @@ hr.legend-key-line{
 }
 
 #sidebar {
+  left: 10px;
+  top: 10px;
   overflow-y: auto;
-  max-height: 50%;
+  max-height: 75%;
 }
 
 #sidebar a.story-browser {
+  display: none;
+
   width: 20%;
   height: 50px;
-  display: block;
   position: fixed;
-  top: 0;
-  opacity: 0.5;
-}
-
-#sidebar a.story-browser {
   padding-top: 17px;
+  top: 0;
+
+  opacity: 0.5;
   color: #fff;
   font-family: "fontawesome";
 }
@@ -374,11 +378,18 @@ hr.legend-key-line{
 }
 
 @media only screen and (max-device-width: 500px) {
+
   #sidebar{
     height: 50px;
     width: 100%;
+    left: 0;
+    top: 0;
     text-align: center;
     overflow-y: hidden;
+  }
+
+  #sidebar a.story-browser {
+    display: block;
   }
 
   #story-points {
