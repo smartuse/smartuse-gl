@@ -350,33 +350,26 @@ class MapLegend {
 
   appendToLegend(legend){
 
+    var item = document.createElement("div");
+    item.className = "legend-entry";
+    var key = document.createElement("span");
+    var value = document.createElement("span");
+
     if(this.type == "opacity-range"){
       for(var [label,value] of Object.entries(this.items.targetRange)){
-        var item = document.createElement("div");
-        var key = document.createElement("span");
         key.className = "legend-key";
         key.style.backgroundColor = "#fff";
         key.style.opacity = value;
 
-        var value = document.createElement("span");
         value.innerHTML = this.items.labels[label];
-        item.appendChild(key);
-        item.appendChild(value);
-        legend.appendChild(item);
       }
     } else if(this.type == "color-range"){
       for(var [label,value] of Object.entries(this.items)){
-        var item = document.createElement("div");
-        var key = document.createElement("span");
         key.className = "legend-key";
         key.style.backgroundColor = value;
         key.style.opacity = 1;
 
-        var value = document.createElement("span");
         value.innerHTML = label;
-        item.appendChild(key);
-        item.appendChild(value);
-        legend.appendChild(item);
       }
     } else if(this.type == "color-range-gradient"){
 
@@ -391,25 +384,18 @@ class MapLegend {
       }
       gradientString += ")";
 
-      var item = document.createElement("div");
-      var key = document.createElement("span");
       key.className = "legend-key-gradient";
       key.style.background = gradientString;
       key.style.opacity = 1;
 
       for(var [label,value] of Object.entries(this.items)){
-        var value = document.createElement("span");
         value.innerHTML = label;
-        item.appendChild(value);
       }
-      item.appendChild(key);
-      legend.appendChild(item);
 
     } else if(this.type == "circle-size-range"){
       for(var [label,value] of Object.entries(this.items.targetRange)){
         var circle_size = value * 0.5;
-        var item = document.createElement("div");
-        var key = document.createElement("span");
+
         key.className = "legend-key";
         key.style.backgroundColor = "transparent";
         key.style.border = "#fff 1px solid";
@@ -420,58 +406,41 @@ class MapLegend {
         key.style.width = circle_size+"px";
         key.style.height = circle_size+"px";
 
-        var value = document.createElement("span");
         value.innerHTML = this.items.labels[label];
-        item.appendChild(key);
-        item.appendChild(value);
-        legend.appendChild(item);
       }
     } else if(this.type == "dashed-line"){
       for(label of this.items.labels){
-        var item = document.createElement("div");
-        var key = document.createElement("hr");
         key.className = "legend-key-line";
         key.style.borderTop = "2px dashed #fff";
         key.style.opacity = 1;
 
-        var value = document.createElement("span");
         value.innerHTML = label;
-        item.appendChild(key);
-        item.appendChild(value);
-        legend.appendChild(item);
       }
     } else if(this.type == "line"){
       for(label of this.items.labels){
-        var item = document.createElement("div");
-        var key = document.createElement("hr");
+
+        key.appendChild(document.createElement("hr"));
         key.className = "legend-key-line";
         key.style.borderTop = "2px solid #fff";
         key.style.opacity = 1;
 
-        var value = document.createElement("span");
         value.innerHTML = label;
-        item.appendChild(key);
-        item.appendChild(value);
-        legend.appendChild(item);
       }
     } else if(this.type == "line-range"){
 
-      // "Legend Label": {"width":1,"line-type":"solid",color:"#fff"}
-
       for(var [label,value] of Object.entries(this.items)){
-        var item = document.createElement("div");
-        var key = document.createElement("hr");
+        key.appendChild(document.createElement("hr"));
         key.className = "legend-key-line";
         key.style.borderTop = value["width"] + "px "+value["line-type"]+" "+value["color"];
         key.style.opacity = 1;
 
-        var value = document.createElement("span");
         value.innerHTML = label;
-        item.appendChild(key);
-        item.appendChild(value);
-        legend.appendChild(item);
       }
     }
+
+    item.appendChild(key);
+    item.appendChild(value);
+    legend.appendChild(item);
   }
 
 }

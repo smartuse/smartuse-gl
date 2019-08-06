@@ -233,7 +233,7 @@ width: 250px;
   margin-right: 60px;
   min-width: 150px;
   max-height: 75%;
-  overflow: scroll;
+  overflow: auto;
 }
 
 @media only screen and (max-device-width: 500px) {
@@ -262,6 +262,10 @@ width: 250px;
   .legend {
     margin-right: 50px;
   }
+}
+
+.legend-entry {
+  margin-bottom: 5px;
 }
 
 .legend-key {
@@ -441,4 +445,19 @@ hr.legend-key-line{
   font-size: 20px;
   padding-top: 5px;
   padding-bottom: 5px;
+}
+
+.pin-bottomleft {
+  bottom: 35px;
+  left: 10px;
+}
+
+.rounded-toggle {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+label.col6.center {
+  color: #fff;
 }
